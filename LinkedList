@@ -1,0 +1,130 @@
+#define  _CRT_SECURE_NO_WARNINGS 1
+#include<stdio.h>
+#include<stdlib.h>
+typedef int DataType;
+typedef struct node
+{
+	DataType data;
+	struct node *next;
+}LinkList;
+
+//初始化
+LinkList *InitList() {
+	LinkList* head;
+	head = (LinkList*)malloc(sizeof(LinkList));
+	head->data = 0;
+	head->next = NULL;
+	return head;
+}
+
+//头插法
+void HeadMethod(LinkList* head, DataType n) {
+	LinkList* p = (LinkList*)malloc(sizeof(LinkList));
+	p->data = n;
+	p->next = head->next;
+	head->next = p;
+}//与插入顺序相反
+
+//获取尾节点
+LinkList* getTail(LinkList* L) {
+	LinkList* p = L;
+	while (p->next != NULL) {
+		p = p->next;
+	}
+	return p;
+}
+
+//尾插法
+void TailMethod(LinkList* head, DataType n) {
+	LinkList* p = (LinkList*)malloc(sizeof(LinkList));
+	p->data = n;
+	p->next = NULL;
+
+	// 找到尾节点
+	LinkList* tail = head;
+	while (tail->next != NULL) {
+		tail = tail->next;
+	}
+
+	tail->next = p;
+}
+
+//遍历
+void DispList(LinkList* head) {
+	LinkList* p;
+	p = head->next;
+	while (p != NULL) {
+		printf("%d", p->data);
+		p = p->next;
+	}
+	printf("\n");
+}
+
+//指定位置插入
+void InsList(LinkList* head, int pos, DataType n) {
+	LinkList* p = head;
+	int i = 0;
+	while (i < pos - 1 && p->next != NULL) {
+		p = p->next;
+		i++;
+	}
+	if (p != NULL) {
+		LinkList* s = (LinkList*)malloc(sizeof(LinkList));
+		s->data = n;
+		s->next = p->next;
+		p->next = s;
+	}
+}
+
+//删除
+void DelList(LinkList* head, int pos) {
+	int i = 0;
+	DataType n;
+	LinkList* p = head, *s;
+	while (p->next != NULL && i < pos - 1) {
+		p = p->next;
+		i++;
+	}
+	if (p->next != NULL && i == pos - 1) {
+		s = p->next;
+		n = s->data;
+		p->next = s->next;
+		free(s);
+	}
+}
+
+//求表长
+int LenList(LinkList* head) {
+	LinkList* p = head->next;
+	int i = 0;
+	while (p != NULL) {
+		p = p->next;
+		i++;
+	}
+	return i;
+}
+
+//释放内存
+void DestroyList(LinkList* head) {
+	LinkList* p = head;
+	while (p != NULL) {
+		LinkList* temp = p;
+		p = p->next;
+		free(temp);
+	}
+}
+
+int main() {
+	LinkList* List = InitList();
+	LinkList* tail = getTail(List);
+	TailMethod(List, 10);
+	TailMethod(List, 20);
+	TailMethod(List, 30);
+	DispList(List);
+	InsList(List, 2, 15);
+	DispList(List);
+	DelList(List, 2);
+	DispList(List);
+	DestroyList(List);
+	return 0;
+}
