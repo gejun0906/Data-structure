@@ -1,0 +1,75 @@
+#define  _CRT_SECURE_NO_WARNINGS 1
+#include<stdio.h>
+#include<stdlib.h>
+typedef int Datatype;
+typedef struct dunode
+{
+	Datatype data;
+	struct dunode* prev;
+	struct dunode* next;
+}DuLinkList;
+
+//初始化
+void InitList(DuLinkList* L) {
+	L->data = 0;
+	L->next = NULL;
+}
+
+//头插法
+void InsertHead(DuLinkList* head, Datatype x) {
+	DuLinkList* p = (DuLinkList*)malloc(sizeof(DuLinkList));
+	p->data = x;
+	p->next = head->next;
+	p->prev = head;
+	if (head->next != NULL) {
+		head->next->prev = p;
+	}
+	head->next = p;
+}
+
+//尾插法
+DuLinkList* InsertTail(DuLinkList* tail, Datatype x) {
+	DuLinkList* p = (DuLinkList*)malloc(sizeof(DuLinkList));
+	p->data = x;
+	p->prev = tail;
+	tail->next = p;
+	p->next = NULL;
+	return p;
+}
+
+//插入
+void InsertNode(DuLinkList* List, int pos, Datatype x) {
+	DuLinkList* p = List;
+	int i = 0;
+	while (i < pos - 1 && p->next != NULL) {
+		p = p->next;
+		i++;
+	}
+	if (p != NULL) {
+		DuLinkList* q = (DuLinkList*)malloc(sizeof(DuLinkList));
+		q->data = x;
+		q->next = p->next;
+		q->prev = p;
+		p->next->prev = q;
+		p->next = q;
+	}
+}
+
+//删除
+void DelList(DuLinkList* List, int pos) {
+	int i = 0;
+	Datatype x;
+	DuLinkList* p = List;
+	while (p->next != NULL && i < pos - 1) {
+		p = p->next;
+		i++;
+	}
+	if (p->next != NULL && i == pos - 1) {
+		DuLinkList* s;
+		s = p->next;
+		p->next = s->next;
+		s->next->prev = p;
+		free(s);
+
+	}
+}
