@@ -1,0 +1,222 @@
+#define  _CRT_SECURE_NO_WARNINGS 1
+#include <stdio.h>
+#include <stdlib.h>
+typedef int DataType;
+// 定义循环链表节点结构
+typedef struct Node {
+    DataType data;
+    struct Node* next;
+} Node;
+
+// 定义循环链表结构
+typedef struct {
+    Node* head;
+    DataType size;
+} CircularLinkedList;
+// 初始化循环链表
+void initList(CircularLinkedList* list) {
+    list->head = NULL;
+    list->size = 0;
+}
+// 检查链表是否为空
+int isEmpty(CircularLinkedList* list) {
+    return list->head == NULL;
+}
+// 获取链表长度
+int getLength(CircularLinkedList* list) {
+    return list->size;
+}
+// 在链表末尾添加节点
+void append(CircularLinkedList* list, DataType data) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = data;
+
+    if (isEmpty(list)) {
+        list->head = newNode;
+        newNode->next = list->head;
+    }
+    else {
+        Node* current = list->head;
+        while (current->next != list->head) {
+            current = current->next;
+        }
+        current->next = newNode;
+        newNode->next = list->head;
+    }
+    list->size++;
+}
+// 在链表头部添加节点
+void prepend(CircularLinkedList* list, DataType data) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = data;
+
+    if (isEmpty(list)) {
+        list->head = newNode;
+        newNode->next = list->head;
+    }
+    else {
+        Node* current = list->head;
+        while (current->next != list->head) {
+            current = current->next;
+        }
+        current->next = newNode;
+        newNode->next = list->head;
+        list->head = newNode;
+    }
+    list->size++;
+}
+// 在指定位置插入节点
+void insertAt(CircularLinkedList* list, int index, DataType data) {
+    if (index <= 0) {
+        prepend(list, data);
+    }
+    else if (index >= list->size) {
+        append(list, data);
+    }
+    else {
+        Node* newNode = (Node*)malloc(sizeof(Node));
+        newNode->data = data;
+
+        Node* current = list->head;
+        for (int i = 0; i < index - 1; i++) {
+            current = current->next;
+        }
+        newNode->next = current->next;
+        current->next = newNode;
+        list->size++;
+    }
+}
+// 删除指定值的节点
+void removeNode(CircularLinkedList* list, DataType data) {
+    if (isEmpty(list)) {
+        return;
+    }
+
+    Node* current = list->head;
+    Node* prev = NULL;
+    Node* toDelete = NULL;
+
+    // 查找要删除的节点
+    do {
+        if (current->data == data) {
+            toDelete = current;
+            break;
+        }
+        prev = current;
+        current = current->next;
+    } while (current != list->head);
+
+    if (toDelete == NULL) {
+        printf("Data not found in the list.\n");
+        return;
+    }
+
+    // 如果要删除的是头节点
+    if (toDelete == list->head) {
+        // 如果链表只有一个节点
+        if (list->head->next == list->head) {
+            free(list->head);
+            list->head = NULL;
+        }
+        else {
+            // 找到尾节点
+            Node* last = list->head;
+            while (last->next != list->head) {
+                last = last->next;
+            }
+            last->next = list->head->next;
+            Node* temp = list->head;
+            list->head = list->head->next;
+            free(temp);
+        }
+    }
+    else {
+        prev->next = toDelete->next;
+        free(toDelete);
+    }
+
+    list->size--;
+}
+// 查找节点
+int search(CircularLinkedList* list, DataType data) {
+    if (isEmpty(list)) {
+        return -1;
+    }
+
+    Node* current = list->head;
+    int index = 0;
+
+    do {
+        if (current->data == data) {
+            return index;
+        }
+        current = current->next;
+        index++;
+    } while (current != list->head);
+
+    return -1;
+}
+// 打印链表
+void printList(CircularLinkedList* list) {
+    if (isEmpty(list)) {
+        printf("List is empty.\n");
+        return;
+    }
+
+    Node* current = list->head;
+    printf("Circular Linked List: ");
+    do {
+        printf("%d ", current->data);
+        current = current->next;
+    } while (current != list->head);
+    printf("\n");
+}
+// 释放链表内存
+void freeList(CircularLinkedList* list) {
+    if (isEmpty(list)) {
+        return;
+    }
+
+    Node* current = list->head;
+    Node* nextNode;
+
+    do {
+        nextNode = current->next;
+        free(current);
+        current = nextNode;
+    } while (current != list->head);
+
+    list->head = NULL;
+    list->size = 0;
+}
+int main() {
+    CircularLinkedList list;
+    initList(&list);
+
+    // 测试添加操作
+    append(&list, 10);
+    append(&list, 20);
+    append(&list, 30);
+    prepend(&list, 5);
+    insertAt(&list, 2, 15);
+
+    printList(&list); // 应该输出: 5 10 15 20 30
+
+    // 测试查找操作
+    int index = search(&list, 20);
+    printf("20 found at index: %d\n", index); // 应该输出: 3
+
+    // 测试删除操作
+    removeNode(&list, 15);
+    removeNode(&list, 5);
+
+    printList(&list); // 应该输出: 10 20 30
+
+    // 测试长度
+    printf("List length: %d\n", getLength(&list)); // 应该输出: 3
+
+    // 释放内存
+    freeList(&list);
+
+    return 0;
+}
