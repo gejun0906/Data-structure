@@ -1,0 +1,100 @@
+#define  _CRT_SECURE_NO_WARNINGS 1
+#include<stdio.h>
+#include<stdlib.h>
+#include<stdbool.h>
+
+typedef int Datatype;
+typedef struct qnode
+{
+	Datatype data;
+	struct qnode* next;
+}LinkListQ;
+
+typedef struct {
+	LinkListQ* front; 
+	LinkListQ* rear;  
+} LinkQueue;
+
+LinkQueue* initQueue() {
+	LinkQueue* Q;
+	Q = (LinkQueue*)malloc(sizeof(LinkQueue));
+	Q->front = NULL;
+	Q->rear = NULL;
+	return Q;
+}
+
+bool EmptyQueue(LinkQueue* Q) {
+	if (Q->front == Q->rear) {
+		return true;
+	}
+	return false;
+}
+
+void EnQueue(LinkQueue* Q, Datatype x) {
+	LinkListQ* p = (LinkListQ*)malloc(sizeof(LinkListQ));
+	p->data = x;
+	p->next = NULL;
+
+	if (Q->rear == NULL) {
+		// 空队列，front 和 rear 都指向新节点
+		Q->front = p;
+		Q->rear = p;
+	}
+	else {
+		// 非空队列，插入队尾
+		Q->rear->next = p;
+		Q->rear = p;
+	}
+}
+
+bool DeQueue(LinkQueue* Q, Datatype* x) {
+	LinkListQ* p;
+	if (EmptyQueue(Q)) {
+		printf("队空\n");
+		return false;
+	}
+	p = Q->front->next;
+	*x = p->data;
+	Q->front->next = p->next;
+	if (p->next = NULL) {
+		Q->rear = Q->front;
+	}
+	free(p);
+	return true;
+}
+
+bool GetFront(LinkQueue* Q, Datatype* x) {
+	if (EmptyQueue(Q)) {
+		printf("队空\n");
+		return false;
+	}
+	*x = Q->front->next->data;
+	return true;
+}
+
+void ShowQueue(LinkQueue* Q) {
+	if (EmptyQueue(Q)) {
+		printf("队列为空\n");
+		return;
+	}
+
+	LinkListQ* p = Q->front;
+	printf("队列元素: ");
+	while (p != NULL) {
+		printf("%d ", p->data);
+		p = p->next;
+	}
+	printf("\n");
+}
+
+int main() {
+	LinkQueue* Q = initQueue();
+	EnQueue(Q, 1);
+	EnQueue(Q, 2);
+	EnQueue(Q, 3);
+	ShowQueue(Q);
+	Datatype x;
+	DeQueue(Q, &x);
+	printf("出队元素: %d\n", x); 
+	ShowQueue(Q);
+}
