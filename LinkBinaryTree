@@ -1,0 +1,126 @@
+#define  _CRT_SECURE_NO_WARNINGS 1
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+// 二叉树节点结构
+typedef struct TreeNode {
+    char data;               // 节点数据
+    struct TreeNode* left;   // 左子树指针
+    struct TreeNode* right;  // 右子树指针
+} TreeNode;
+
+// 创建新节点
+TreeNode* createNode(char data) {
+    TreeNode* newNode = (TreeNode*)malloc(sizeof(TreeNode));
+    if (newNode == NULL) {
+        printf("Memory allocation failed!\n");
+        exit(1);
+    }
+    newNode->data = data;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    return newNode;
+}
+
+// 先序遍历（根-左-右）
+void preOrderTraversal(TreeNode* root) {
+    if (root != NULL) {
+        printf("%c ", root->data);
+        preOrderTraversal(root->left);
+        preOrderTraversal(root->right);
+    }
+}
+
+// 中序遍历（左-根-右）
+void inOrderTraversal(TreeNode* root) {
+    if (root != NULL) {
+        inOrderTraversal(root->left);
+        printf("%c ", root->data);
+        inOrderTraversal(root->right);
+    }
+}
+
+// 后序遍历（左-右-根）
+void postOrderTraversal(TreeNode* root) {
+    if (root != NULL) {
+        postOrderTraversal(root->left);
+        postOrderTraversal(root->right);
+        printf("%c ", root->data);
+    }
+}
+
+// 层序遍历（使用队列实现）
+void levelOrderTraversal(TreeNode* root) {
+    if (root == NULL) return;
+
+    // 简单队列实现
+    TreeNode* queue[100];
+    int front = 0, rear = 0;
+
+    queue[rear++] = root;
+
+    while (front < rear) {
+        TreeNode* current = queue[front++];
+        printf("%c ", current->data);
+
+        if (current->left != NULL)
+            queue[rear++] = current->left;
+
+        if (current->right != NULL)
+            queue[rear++] = current->right;
+    }
+}
+
+// 计算树的高度
+int treeHeight(TreeNode* root) {
+    if (root == NULL) return 0;
+
+    int leftHeight = treeHeight(root->left);
+    int rightHeight = treeHeight(root->right);
+
+    return (leftHeight > rightHeight) ? leftHeight + 1 : rightHeight + 1;
+}
+
+// 释放二叉树内存
+void freeTree(TreeNode* root) {
+    if (root == NULL) return;
+
+    freeTree(root->left);
+    freeTree(root->right);
+    free(root);
+}
+
+int main() {
+    TreeNode* root = createNode('A');
+    root->left = createNode('B');
+    root->right = createNode('C');
+    root->left->left = createNode('D');
+    root->left->right = createNode('E');
+    root->right->right = createNode('F');
+
+    // 遍历测试
+    printf("Pre-order traversal: ");
+    preOrderTraversal(root);
+    printf("\n");
+
+    printf("In-order traversal: ");
+    inOrderTraversal(root);
+    printf("\n");
+
+    printf("Post-order traversal: ");
+    postOrderTraversal(root);
+    printf("\n");
+
+    printf("Level-order traversal: ");
+    levelOrderTraversal(root);
+    printf("\n");
+
+    // 树高测试
+    printf("Tree height: %d\n", treeHeight(root));
+
+    // 释放内存
+    freeTree(root);
+
+    return 0;
+}
