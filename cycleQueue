@@ -1,0 +1,83 @@
+#define  _CRT_SECURE_NO_WARNINGS 1
+#define MaxSize 50
+#include<stdio.h>
+#include<stdbool.h>
+
+typedef int Datatype;
+typedef struct
+{
+	Datatype data[MaxSize];
+	int front, rear;
+}cycleQueue;
+
+void initQueue(cycleQueue* Q) {
+	Q->front = 0;
+	Q->rear = 0;
+}
+
+//判断是否为空
+bool EmptyQueue(cycleQueue* Q) {
+	if (Q->front == Q->rear) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+//入队列
+bool EnQueue(cycleQueue* Q, Datatype e) {
+	if ((Q->rear + 1) %MaxSize == Q->front) {
+		return false;
+	}
+	Q->data[Q->rear] = e;
+	Q->rear = (Q->rear + 1) % MaxSize;
+	return true;
+}
+
+//出队列
+bool DeQueue(cycleQueue* Q, Datatype *e) {
+	if (EmptyQueue(Q)) {
+		return false;
+	}
+	*e = Q->data[Q->front];
+	Q->front = (Q->front + 1) % MaxSize;
+	return true;
+}
+
+//取队头
+bool GetFront(cycleQueue* Q, Datatype *x) {
+	if (EmptyQueue(Q)) {
+		printf("队列为空\n");
+		return false;
+	}
+	*x = Q->data[Q->front];
+	return true;
+}
+
+//输出元素
+bool ShowQueue(cycleQueue* Q) {
+	int p = Q->front;
+	if (p == Q->rear) {
+		printf("队空\n");
+		return false;
+	}
+	while (p != Q->rear) {
+		printf("%d", Q->data[p]);
+		p = (p + 1) % MaxSize;
+	}
+	printf("\n");
+	return true;
+}
+
+int main01() {
+	cycleQueue Q;
+	initQueue(&Q);
+	EnQueue(&Q, 1);
+	EnQueue(&Q, 2);
+	EnQueue(&Q, 3);
+	ShowQueue(&Q);
+	Datatype x;
+	DeQueue(&Q, &x);
+	ShowQueue(&Q);
+
+}
