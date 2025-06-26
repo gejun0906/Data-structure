@@ -1,0 +1,93 @@
+#define  _CRT_SECURE_NO_WARNINGS 1
+#include<stdio.h>
+#include<stdlib.h>
+#include<stdbool.h>
+
+#define MaxSize 100
+
+typedef char Datatype;
+typedef struct
+{
+	Datatype data[MaxSize];
+	int size;
+}SeqBinaryTree;
+
+void initTree(SeqBinaryTree* T) {
+	T->size = 0;
+	for (int i = 0; i < MaxSize; i++) {
+		T->data[i] = 0;   // 初始化为空字符, 从0开始存储
+	}
+}
+
+// 在指定位置插入值
+bool inSert(SeqBinaryTree* T, int index, Datatype e) {
+	if (index >= MaxSize) {
+		printf("超出范围\n");
+		return false;
+	}
+	T->data[index] = e;
+	if (index >= T->size) {
+		T->size = index + 1;
+	}
+	return true;
+}
+
+// 获取左子节点索引
+int getLeftChild(int index) {
+	return 2 * index + 1;
+}
+// 获取右子节点索引
+int getRightChild(int index) {
+	return 2 * index + 2;
+}
+// 获取父节点索引
+int getParent(int index) {
+	if (index == 0) {
+		return -1;
+	}
+	return (index - 1) / 2;
+}
+
+//打印树结构
+void printTree(SeqBinaryTree* T) {
+	for (int i = 0; i < T->size; i++) {
+		if (T->data != '\0') {
+			printf("Index %d; %c\n", i, T->data);
+		}
+		else{
+			printf("Index %d: NULL\n", i);
+		}
+	}
+}
+
+// 层次遍历打印树
+void OrderTraversal(const SeqBinaryTree* T) {
+	for (int i = 0; i < T->size; i++) {
+		if (T->data != '\0') {
+			printf("%c ", T->data[i]);
+		}
+	}
+	printf("\n");
+}
+
+int main01() {
+	SeqBinaryTree tree;
+	initTree(&tree);
+
+	inSert(&tree, 0, 'A');
+	inSert(&tree, 1, 'B');
+	inSert(&tree, 2, 'C');
+	inSert(&tree, 3, 'D');
+	inSert(&tree, 4, 'E');
+	inSert(&tree, 5, 'F');
+	inSert(&tree, 6, 'G');
+
+	printTree(&tree);
+	OrderTraversal(&tree);
+
+	printf("Parent of B (index 1) is: %c\n", tree.data[getParent(1)]);
+	printf("Left child of B (index 1) is: %c\n", tree.data[getLeftChild(1)]);
+	printf("Right child of B (index 1) is: %c\n", tree.data[getRightChild(1)]);
+
+	return 0;
+}
