@@ -1,0 +1,121 @@
+#define  _CRT_SECURE_NO_WARNINGS 1
+//广度优先搜索
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_SIZE 100
+
+// 二叉树节点结构体
+typedef struct TreeNode {
+    int data;
+    struct TreeNode* left;
+    struct TreeNode* right;
+} TreeNode;
+
+// 队列结构体
+typedef struct Queue {
+    TreeNode* items[MAX_SIZE];
+    int front;
+    int rear;
+} Queue;
+
+// 初始化队列
+void initQueue(Queue* q) {
+    q->front = -1;
+    q->rear = -1;
+}
+
+// 判断队列是否为空
+int isEmpty(Queue* q) {
+    return q->front == -1;
+}
+
+// 判断队列是否已满
+int isFull(Queue* q) {
+    return (q->rear + 1) % MAX_SIZE == q->front;
+}
+
+// 入队
+void enqueue(Queue* q, TreeNode* node) {
+    if (isFull(q)) {
+        printf("队列已满\n");
+        return;
+    }
+    if (isEmpty(q)) {
+        q->front = 0;
+    }
+    q->rear = (q->rear + 1) % MAX_SIZE;
+    q->items[q->rear] = node;
+}
+
+// 出队
+TreeNode* dequeue(Queue* q) {
+    if (isEmpty(q)) {
+        printf("队列为空\n");
+        return NULL;
+    }
+    TreeNode* item = q->items[q->front];
+    if (q->front == q->rear) {
+        q->front = q->rear = -1; // 队列只有一个元素，出队后重置
+    }
+    else {
+        q->front = (q->front + 1) % MAX_SIZE;
+    }
+    return item;
+}
+
+// 创建新节点
+TreeNode* createNode(int value) {
+    TreeNode* newNode = (TreeNode*)malloc(sizeof(TreeNode));
+    if (newNode == NULL) {
+        printf("内存分配失败\n");
+        exit(1);
+    }
+    newNode->data = value;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    return newNode;
+}
+
+// 层次遍历（使用队列）
+void levelOrderTraversal(TreeNode* root) {
+    if (root == NULL) return;
+
+    Queue q;
+    initQueue(&q);
+    enqueue(&q, root);
+
+    printf("层次遍历结果: ");
+    while (!isEmpty(&q)) {
+        TreeNode* current = dequeue(&q);
+        printf("%d ", current->data);
+
+        if (current->left != NULL) {
+            enqueue(&q, current->left);
+        }
+        if (current->right != NULL) {
+            enqueue(&q, current->right);
+        }
+    }
+    printf("\n");
+}
+
+int main() {
+    TreeNode* root = createNode(1);
+    root->left = createNode(2);
+    root->right = createNode(3);
+    root->left->left = createNode(4);
+    root->left->right = createNode(5);
+    root->right->right = createNode(6);
+
+    levelOrderTraversal(root);
+
+    free(root->left->left);
+    free(root->left->right);
+    free(root->left);
+    free(root->right->right);
+    free(root->right);
+    free(root);
+
+    return 0;
+}
