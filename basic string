@@ -1,0 +1,181 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_SIZE 100
+
+// 串的定长顺序存储结构
+typedef struct {
+    char ch[MAX_SIZE + 1]; // 存储串的字符数组，ch[0]不使用
+    int length;            // 串的当前长度
+} SString;
+
+// 初始化串
+void InitString(SString* S) {
+    S->length = 0;
+    memset(S->ch, 0, sizeof(S->ch));
+}
+
+// 赋值操作：将chars赋值给S
+int StrAssign(SString* S, const char* chars) {
+    int len = strlen(chars);
+    if (len > MAX_SIZE) {
+        return 0; // 超出最大长度，赋值失败
+    }
+
+    for (int i = 1; i <= len; i++) {
+        S->ch[i] = chars[i - 1];
+    }
+    S->length = len;
+    return 1;
+}
+
+// 复制操作：将T复制到S
+void StrCopy(SString* S, SString T) {
+    for (int i = 1; i <= T.length; i++) {
+        S->ch[i] = T.ch[i];
+    }
+    S->length = T.length;
+}
+
+// 判断串是否为空
+int StrEmpty(SString S) {
+    return S.length == 0;
+}
+
+// 比较两个串
+int StrCompare(SString S, SString T) {
+    for (int i = 1; i <= S.length && i <= T.length; i++) {
+        if (S.ch[i] != T.ch[i]) {
+            return S.ch[i] - T.ch[i];
+        }
+    }
+    return S.length - T.length;
+}
+
+// 获取串长度
+int StrLength(SString S) {
+    return S.length;
+}
+
+// 清空串
+void ClearString(SString* S) {
+    S->length = 0;
+    memset(S->ch, 0, sizeof(S->ch));
+}
+
+// 连接两个串
+int Concat(SString* T, SString S1, SString S2) {
+    if (S1.length + S2.length > MAX_SIZE) {
+        return 0; // 超出最大长度，连接失败
+    }
+
+    for (int i = 1; i <= S1.length; i++) {
+        T->ch[i] = S1.ch[i];
+    }
+
+    for (int i = 1; i <= S2.length; i++) {
+        T->ch[S1.length + i] = S2.ch[i];
+    }
+
+    T->length = S1.length + S2.length;
+    return 1;
+}
+
+// 求子串
+int SubString(SString* Sub, SString S, int pos, int len) {
+    if (pos < 1 || pos > S.length || len < 0 || pos + len - 1 > S.length) {
+        return 0; // 参数不合法
+    }
+
+    for (int i = 1; i <= len; i++) {
+        Sub->ch[i] = S.ch[pos + i - 1];
+    }
+    Sub->length = len;
+    return 1;
+}
+
+// 查找子串位置(朴素模式匹配)
+int Index(SString S, SString T, int pos) {
+    if (pos < 1 || pos > S.length || T.length == 0) {
+        return 0;
+    }
+
+    int i = pos;
+    int j = 1;
+    while (i <= S.length && j <= T.length) {
+        if (S.ch[i] == T.ch[j]) {
+            i++;
+            j++;
+        }
+        else {
+            i = i - j + 2;
+            j = 1;
+        }
+    }
+
+    if (j > T.length) {
+        return i - T.length;
+    }
+    else {
+        return 0;
+    }
+}
+
+// 打印串
+void PrintString(SString S) {
+    for (int i = 1; i <= S.length; i++) {
+        printf("%c", S.ch[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    SString S, T, Sub;
+    char chars[] = "Hello, World!";
+
+    // 初始化并赋值
+    InitString(&S);
+    StrAssign(&S, chars);
+    printf("字符串S: ");
+    PrintString(S);
+
+    // 复制操作
+    InitString(&T);
+    StrCopy(&T, S);
+    printf("复制后的T: ");
+    PrintString(T);
+
+    // 比较操作
+    SString S2;
+    InitString(&S2);
+    StrAssign(&S2, "Hello");
+    printf("比较S和S2: %d\n", StrCompare(S, S2));
+
+    // 连接操作
+    SString Con;
+    InitString(&Con);
+    Concat(&Con, S2, T);
+    printf("连接后的串: ");
+    PrintString(Con);
+
+    // 求子串
+    InitString(&Sub);
+    SubString(&Sub, S, 8, 5);
+    printf("S的子串(从第8个字符开始，长度5): ");
+    PrintString(Sub);
+
+    // 查找子串
+    SString pattern;
+    InitString(&pattern);
+    StrAssign(&pattern, "World");
+    int pos = Index(S, pattern, 1);
+    if (pos > 0) {
+        printf("'World'在S中的位置: %d\n", pos);
+    }
+    else {
+        printf("未找到子串\n");
+    }
+
+    return 0;
+}
